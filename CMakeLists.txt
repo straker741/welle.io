@@ -112,6 +112,7 @@ include_directories(
 )
 
 set(backend_sources
+    src/backend/analyzer.cpp \
     src/backend/dab-audio.cpp
     src/backend/decoder_adapter.cpp
     src/backend/dab_decoder.cpp
@@ -135,6 +136,7 @@ set(backend_sources
     src/backend/tools.cpp
     src/backend/uep-protection.cpp
     src/backend/viterbi.cpp
+    src/backend/viterbi2.c
     src/various/Socket.cpp
     src/various/Xtan2.cpp
     src/various/channels.cpp

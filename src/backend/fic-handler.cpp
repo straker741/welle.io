@@ -52,11 +52,12 @@ uint8_t PI_X [24] = {
 FicHandler::FicHandler(RadioControllerInterface& mr) :
     Viterbi(768),
     fibProcessor(mr),
+    ana(),
     myRadioInterface(mr),
     bitBuffer_out(768),
     ofdm_input(2304),
     viterbiBlock(3072 + 24)
-{
+{  
     PI_15 = getPCodes(15 - 1);
     PI_16 = getPCodes(16 - 1);
     std::vector<uint8_t> shiftRegister(9, 1);
@@ -110,15 +111,23 @@ void FicHandler::setBitsperBlock(int16_t b)
  */
 void FicHandler::processFicBlock(const softbit_t *data, int16_t blkno)
 {
+    // data are 2 * 1536 in size
+
     if (blkno == 1) {
         index = 0;
         ficno = 0;
     }
 
     if ((1 <= blkno) && (blkno <= 3)) {
-        for (int i = 0; i < bitsperBlock; i ++) {
-            ofdm_input[index ++] = data[i];
+        for (int i = 0; i < bitsperBlock; i ++) {          
+            hardbits[index] = (data[i] > 0) ? 1 : 0;
+            ofdm_input[index] = data[i];
+            index++;
             if (index >= 2304) {
+                // In order to be able to calculate BER
+                // we have to convert ficblock and then 
+                // save original FIC before error correction
+                ana.feed_uncorrected_data(hardbits, ficno);
                 processFicInput(ofdm_input.data(), ficno);
                 index = 0;
                 ficno++;
@@ -132,22 +141,11 @@ void FicHandler::processFicBlock(const softbit_t *data, int16_t blkno)
     //  with index = 0
 }
 
-/**
- * \brief processFicInput
- * we have a vector of 2304 (0 .. 2303) soft bits that has
- * to be de-punctured and de-conv-ed into a block of 768 bits
- * In this approach we first create the full 3072 block (i.e.
- * we first depuncture, and then we apply the deconvolution
- * In the next coding step, we will combine this function with the
- * one above
- */
-void FicHandler::processFicInput(const softbit_t *ficblock, int16_t ficno)
+void FicHandler::depuncture(const softbit_t *ficblock)
 {
     int16_t input_counter = 0;
     int16_t i, k;
     int32_t local         = 0;
-
-    memset(viterbiBlock.data(), 0, viterbiBlock.size() * sizeof(*viterbiBlock.data()));
 
     /**
      * a block of 2304 bits is considered to be a codeword
@@ -189,6 +187,24 @@ void FicHandler::processFicInput(const softbit_t *ficblock, int16_t ficno)
         }
         local ++;
     }
+}
+
+/**
+ * \brief processFicInput
+ * we have a vector of 2304 (0 .. 2303) soft bits that has
+ * to be de-punctured and de-conv-ed into a block of 768 bits
+ * In this approach we first create the full 3072 block (i.e.
+ * we first depuncture, and then we apply the deconvolution
+ * In the next coding step, we will combine this function with the
+ * one above
+ */
+void FicHandler::processFicInput(const softbit_t *ficblock, int16_t ficno)
+{
+    int16_t i;
+    
+    memset(viterbiBlock.data(), 0, viterbiBlock.size() * sizeof(*viterbiBlock.data()));
+
+    depuncture(ficblock);
 
     /**
      * Now we have the full word ready for deconvolution
@@ -196,7 +212,11 @@ void FicHandler::processFicInput(const softbit_t *ficblock, int16_t ficno)
      */
     deconvolve(viterbiBlock.data(), bitBuffer_out.data());
 
+    // Now we save error corrected data
+    ana.feed_corrected_data(bitBuffer_out.data());
+
     /**
+     * DESCRAMBLING
      * if everything worked as planned, we now have a
      * 768 bit vector containing three FIB's
      *
@@ -215,6 +235,13 @@ void FicHandler::processFicInput(const softbit_t *ficblock, int16_t ficno)
     for (i = ficno * 3; i < ficno * 3 + 3; i ++) {
         uint8_t *p = &bitBuffer_out[(i % 3) * 256];
         const bool crcvalid = check_CRC_bits(p, 256);
+ 
+        /* ANALYZING */
+        ana.ber.receivedFIBs +=1;
+        if (!(crcvalid)) {      
+            ana.ber.faultyFIBs += 1;
+        }
+        
         myRadioInterface.onFIBDecodeSuccess(crcvalid, p);
         if (crcvalid) {
             fibProcessor.processFIB(p, ficno);
@@ -226,6 +253,12 @@ void FicHandler::processFicInput(const softbit_t *ficblock, int16_t ficno)
         else if (fic_decode_success_ratio > 0) {
             fic_decode_success_ratio--;
         }
+    }
+    
+    if (ana.ber.receivedFIBs == 12) {  
+        // Once we parse all 12 FIBs we calculate error rate
+        ana.calculateBER();
+        ana.ber.receivedFIBs = 0;
     }
 }
 

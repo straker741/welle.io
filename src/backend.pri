@@ -85,6 +85,7 @@ INCLUDEPATH += \
     $$PWD/libs/fec
 
 HEADERS += \
+    $$PWD/backend/analyzer.h \
     $$PWD/backend/dab-audio.h \
     $$PWD/backend/dab_decoder.h \
     $$PWD/backend/dabplus_decoder.h \
@@ -112,7 +113,8 @@ HEADERS += \
     $$PWD/backend/radio-receiver.h \
     $$PWD/backend/tools.h \
     $$PWD/backend/uep-protection.h \
-    $$PWD/backend/viterbi.h \\
+    $$PWD/backend/viterbi.h \
+    $$PWD/backend/viterbi2.h \
     $$PWD/various/fft.h \
     $$PWD/various/ringbuffer.h \
     $$PWD/various/Xtan2.h \
@@ -141,6 +143,7 @@ HEADERS += \
     $$PWD/input/rtl_tcp.h
 	
 SOURCES += \
+    $$PWD/backend/analyzer.cpp \
     $$PWD/backend/dab-audio.cpp \
     $$PWD/backend/dab_decoder.cpp \
     $$PWD/backend/dabplus_decoder.cpp \
@@ -163,6 +166,7 @@ SOURCES += \
     $$PWD/backend/tools.cpp \
     $$PWD/backend/uep-protection.cpp \
     $$PWD/backend/viterbi.cpp \
+    $$PWD/backend/viterbi2.c \
     $$PWD/various/Xtan2.cpp \
     $$PWD/various/channels.cpp \
     $$PWD/various/fft.cpp \

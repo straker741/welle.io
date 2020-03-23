@@ -35,6 +35,8 @@
 #include "fib-processor.h"
 #include "radio-controller.h"
 
+#include "analyzer.h"
+
 class FicHandler: public Viterbi
 {
     public:
@@ -45,9 +47,11 @@ class FicHandler: public Viterbi
         int     getFicDecodeRatioPercent();
 
         FIBProcessor fibProcessor;
+        Analyzer     ana;
 
     private:
         RadioControllerInterface& myRadioInterface;
+        void        depuncture(const softbit_t *ficblock);
         void        processFicInput(const softbit_t *ficblock, int16_t ficno);
         const int8_t *PI_15;
         const int8_t *PI_16;
@@ -55,9 +59,13 @@ class FicHandler: public Viterbi
         std::vector<softbit_t> ofdm_input;
         std::vector<softbit_t> viterbiBlock;
         int16_t     index = 0;
+        
+        //bitsperBlock = 2 * 1536;
         int16_t     bitsperBlock = 2 * 1536;
         int16_t     ficno = 0;
         uint8_t     PRBS[768];
+
+        uint8_t     hardbits[2304];
 
         // Saturating up/down-counter in range [0, 10] corresponding
         // to the number of FICs with correct CRC
