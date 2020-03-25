@@ -115,6 +115,7 @@ HEADERS += \
     $$PWD/backend/uep-protection.h \
     $$PWD/backend/viterbi.h \
     $$PWD/backend/viterbi2.h \
+    $$PWD/backend/MySQLhandler.h \
     $$PWD/various/fft.h \
     $$PWD/various/ringbuffer.h \
     $$PWD/various/Xtan2.h \
@@ -167,6 +168,7 @@ SOURCES += \
     $$PWD/backend/uep-protection.cpp \
     $$PWD/backend/viterbi.cpp \
     $$PWD/backend/viterbi2.c \
+    $$PWD/backend/MySQLhandler.cpp \
     $$PWD/various/Xtan2.cpp \
     $$PWD/various/channels.cpp \
     $$PWD/various/fft.cpp \

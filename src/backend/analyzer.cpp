@@ -1,7 +1,7 @@
 #include "analyzer.h"
 
 // Constructor
-Analyzer::Analyzer() {
+Analyzer::Analyzer() : db() {
     ber.receivedFIBs = 0;
     ber.faultyFIBs = 0;
     ber.faultyFIBs_rate = 0;
@@ -27,7 +27,7 @@ void Analyzer::dab_bit_to_byte(uint8_t * in, uint8_t * out,uint32_t len)
 
 void Analyzer::feed_corrected_data(uint8_t *fib)
 {
-    memcpy(FIC_dep_dec + 256 * ber.receivedFIBs * sizeof(uint8_t), fib, 256 * 3 * sizeof(uint8_t));
+    memcpy(FIC_dep_dec + 256 * (ber.receivedFIBs % 12) * sizeof(uint8_t), fib, 256 * 3 * sizeof(uint8_t));
 }
 
 void Analyzer::feed_uncorrected_data(uint8_t *fib, int16_t ficno)
@@ -111,8 +111,13 @@ void Analyzer::calculateBER()
 
     // (pseudo) channel BER
     ber.BER = (float)faultyBits/(float)(1536*2*3);
-    ber.meanBER = ber.BER * A + (1 - A) * ber.meanBER;
+    ber.meanBER = ber.BER*ALPHA + (1 - ALPHA)*ber.meanBER;
     ber.faultyFIBs_rate = ber.faultyFIBs/(float)ber.receivedFIBs;
 
-    fprintf(stderr, "BER: %f  |  meanBER: %f\n", ber.BER, ber.meanBER);
+    if (ber.receivedFIBs > 119) {
+        fprintf(stderr, "meanBER: %f\n", ber.meanBER);
+        db.executeInsert(ber.meanBER, "BitErrorRatio");
+        ber.receivedFIBs = 0;
+        ber.faultyFIBs = 0;
+    }
 }

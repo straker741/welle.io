@@ -255,10 +255,9 @@ void FicHandler::processFicInput(const softbit_t *ficblock, int16_t ficno)
         }
     }
     
-    if (ana.ber.receivedFIBs == 12) {  
+    if (ana.ber.receivedFIBs % 12 == 0) {  
         // Once we parse all 12 FIBs we calculate error rate
         ana.calculateBER();
-        ana.ber.receivedFIBs = 0;
     }
 }
 

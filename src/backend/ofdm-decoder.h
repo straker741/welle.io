@@ -24,6 +24,8 @@
 #ifndef __OFDM_DECODER
 #define __OFDM_DECODER
 
+#define BETA 0.1f
+
 #include <cstddef>
 #include <vector>
 #include <thread>
@@ -37,6 +39,7 @@
 #include "radio-controller.h"
 #include "fic-handler.h"
 #include "msc-handler.h"
+#include "MySQL-handler.h"
 
 class OfdmDecoder
 {
@@ -50,7 +53,8 @@ class OfdmDecoder
         void    pushAllSymbols(std::vector<std::vector<DSPCOMPLEX> >&& sym);
         void    reset();
     private:
-        int16_t get_snr(DSPCOMPLEX *);
+        MySQLhandler db;
+        double get_snr(DSPCOMPLEX *);
 
         const DABParams& params;
         RadioControllerInterface& radioInterface;
@@ -76,7 +80,7 @@ class OfdmDecoder
 
         std::vector<softbit_t> ibits;
         int16_t snrCount = 0;
-        int16_t snr = 0;
+        double meanSNR = 0;
 
         const double mer_alpha = 1e-7;
         std::atomic<double> mer = ATOMIC_VAR_INIT(0.0);

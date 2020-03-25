@@ -44,6 +44,7 @@ OfdmDecoder::OfdmDecoder(
         RadioControllerInterface& mr,
         FicHandler& ficHandler,
         MscHandler& mscHandler) :
+    db(),
     params(p),
     radioInterface(mr),
     ficHandler(ficHandler),
@@ -153,9 +154,11 @@ void OfdmDecoder::processPRS()
      * within the signal region and bits outside.
      * It is just an indication
      */
-    snr = 0.7 * snr + 0.3 * get_snr(fft_buffer);
+    meanSNR = BETA*get_snr(fft_buffer) + (1 - BETA)*meanSNR;
     if (++snrCount > 10) {
-        radioInterface.onSNR(snr);
+        fprintf(stderr, "meanSNR: %f\n", meanSNR);
+        db.executeInsert(meanSNR, "SignalToNoiseRatio");
+        radioInterface.onSNR(meanSNR);
         snrCount = 0;
     }
     /**
@@ -235,7 +238,7 @@ void OfdmDecoder::decodeDataSymbol(int32_t sym_ix)
  * Just get the strength from the selected carriers compared
  * to the strength of the carriers outside that region
  */
-int16_t OfdmDecoder::get_snr(DSPCOMPLEX *v)
+double OfdmDecoder::get_snr(DSPCOMPLEX *v)
 {
     int16_t i;
     DSPFLOAT    noise   = 0;

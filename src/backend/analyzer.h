@@ -4,21 +4,24 @@
  * 
  * Original Creator:
  * david.may.muc@googlemail.com
+ * 
+ * Implemented:
+ * jakub.svajka98@gmail.com
  */
 
 #ifndef ANALYZER_H
 #define ANALYZER_H
 
 
-#define A 0.1
+#define ALPHA 0.1f
 // Higher => copies more current value (puts more value on current value)
 // Lower  => puts more value on previous values
 
 #include <stdint.h>
 #include <stdio.h>
 #include <malloc.h>
-#include <string.h>
 #include "dab-constants.h"
+#include "MySQL-handler.h"
 
 extern "C" {
     #include "viterbi2.h"
@@ -50,6 +53,8 @@ class Analyzer
         void            calculateBER();
 
     private:    
+        MySQLhandler    db;
+
         void            dab_bit_to_byte(uint8_t * in, uint8_t * out, uint32_t len);
         void            puncture(uint8_t *ibuf, uint8_t *obuf);
         uint8_t         FIC[1536*2*3];                  // Uncorrected data

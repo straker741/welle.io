@@ -81,6 +81,7 @@ endif()
 find_package(Threads REQUIRED)
 find_package(Faad REQUIRED)
 find_package(MPG123 REQUIRED)
+find_package(MYSQL REQUIRED)
 
 if (RTLSDR)
     find_package(LibRTLSDR REQUIRED)
@@ -137,6 +138,7 @@ set(backend_sources
     src/backend/uep-protection.cpp
     src/backend/viterbi.cpp
     src/backend/viterbi2.c
+    src/backend/MySQLhandler.cpp
     src/various/Socket.cpp
     src/various/Xtan2.cpp
     src/various/channels.cpp
@@ -225,6 +227,7 @@ if(BUILD_WELLE_IO)
       ${FAAD_LIBRARIES}
       ${SoapySDR_LIBRARIES}
       ${MPG123_LIBRARIES}
+      ${MYSQL_LIBRARIES}
       Threads::Threads
       Qt5::Core Qt5::Widgets Qt5::Multimedia Qt5::Charts Qt5::Qml Qt5::Quick Qt5::QuickControls2
     )
@@ -279,6 +282,7 @@ if(BUILD_WELLE_CLI)
       ${LAME_LIBRARIES}
       ${SoapySDR_LIBRARIES}
       ${MPG123_LIBRARIES}
+      ${MYSQL_LIBRARIES}
       Threads::Threads
     )
 
