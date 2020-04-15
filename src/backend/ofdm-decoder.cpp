@@ -149,18 +149,17 @@ void OfdmDecoder::processPRS()
             pending_symbols[0].data(),
             params.T_u * sizeof(DSPCOMPLEX));
     fft_handler.do_FFT ();
+    
     /**
      * The SNR is determined by looking at a segment of bins
      * within the signal region and bits outside.
      * It is just an indication
      */
-    meanSNR = BETA*get_snr(fft_buffer) + (1 - BETA)*meanSNR;
-    if (++snrCount > 10) {
-        fprintf(stderr, "meanSNR: %f\n", meanSNR);
-        db.executeInsert(meanSNR, "SignalToNoiseRatio");
-        radioInterface.onSNR(meanSNR);
-        snrCount = 0;
-    }
+    SNR = get_snr(fft_buffer);
+    //fprintf(stderr, "meanSNR: %f\n", meanSNR);
+    db.executeInsert(SNR, "signaltonoiseratio");
+    radioInterface.onSNR(SNR);
+    
     /**
      * we are now in the frequency domain, and we keep the carriers
      * as coming from the FFT as phase reference.

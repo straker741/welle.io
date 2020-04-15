@@ -6,7 +6,6 @@ Analyzer::Analyzer() : db() {
     ber.faultyFIBs = 0;
     ber.faultyFIBs_rate = 0;
     ber.BER = 0;
-    ber.meanBER = 0;
 }
 
 /**
@@ -93,14 +92,6 @@ void Analyzer::calculateBER()
     puncture(&FIC_dep_enc[2*3096], &FIC_enc_pun[2*2304]);
     puncture(&FIC_dep_enc[3*3096], &FIC_enc_pun[3*2304]);
 
-    //Debugging
-    if (0) {
-        for (i=0; i<768; i++) {
-            fprintf(stderr, "Re: FIC: %d | FIC_enc_pun: %d\n", FIC[i], FIC_enc_pun[i]);
-            fprintf(stderr, "Im: FIC: %d | FIC_enc_pun: %d\n", FIC[i+1536], FIC_enc_pun[i+1536]);
-        }
-    }
-
     // By comparing  FIC  and  FIC_enc_pun  we are able to estimate BER
     for (i=0; i<1536*2*3; i++) {
         temp = (FIC[i] - FIC_enc_pun[i]);
@@ -111,13 +102,14 @@ void Analyzer::calculateBER()
 
     // (pseudo) channel BER
     ber.BER = (float)faultyBits/(float)(1536*2*3);
-    ber.meanBER = ber.BER*ALPHA + (1 - ALPHA)*ber.meanBER;
-    ber.faultyFIBs_rate = ber.faultyFIBs/(float)ber.receivedFIBs;
+    //fprintf(stderr, "BER: %f\n", ber.BER);
+    db.executeInsert(ber.BER, "biterrorratio");
 
-    if (ber.receivedFIBs > 119) {
-        fprintf(stderr, "meanBER: %f\n", ber.meanBER);
-        db.executeInsert(ber.meanBER, "BitErrorRatio");
-        ber.receivedFIBs = 0;
-        ber.faultyFIBs = 0;
-    }
+    // Faulty FIBs Rate
+    ber.faultyFIBs_rate = ber.faultyFIBs/(float)ber.receivedFIBs;
+    //fprintf(stderr, "Faulty FIBs Rate: %f\n", ber.faultyFIBs_rate);
+    db.executeInsert(ber.faultyFIBs_rate, "fiberrorratio");
+    
+    ber.receivedFIBs = 0;
+    ber.faultyFIBs = 0;
 }

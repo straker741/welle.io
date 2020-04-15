@@ -13,10 +13,6 @@
 #define ANALYZER_H
 
 
-#define ALPHA 0.1f
-// Higher => copies more current value (puts more value on current value)
-// Lower  => puts more value on previous values
-
 #include <stdint.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -39,7 +35,6 @@ struct BitErrorRate
     uint32_t    faultyFIBs;
     float       faultyFIBs_rate;
     double      BER;
-    double      meanBER;
 };
 
 

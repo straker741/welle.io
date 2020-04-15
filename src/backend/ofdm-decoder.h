@@ -24,8 +24,6 @@
 #ifndef __OFDM_DECODER
 #define __OFDM_DECODER
 
-#define BETA 0.1f
-
 #include <cstddef>
 #include <vector>
 #include <thread>
@@ -79,8 +77,8 @@ class OfdmDecoder
         FrequencyInterleaver interleaver;
 
         std::vector<softbit_t> ibits;
-        int16_t snrCount = 0;
-        double meanSNR = 0;
+
+        double SNR = 0;
 
         const double mer_alpha = 1e-7;
         std::atomic<double> mer = ATOMIC_VAR_INIT(0.0);
