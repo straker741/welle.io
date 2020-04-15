@@ -138,7 +138,7 @@ set(backend_sources
     src/backend/uep-protection.cpp
     src/backend/viterbi.cpp
     src/backend/viterbi2.c
-    src/backend/MySQLhandler.cpp
+    src/backend/MySQL-handler.cpp
     src/various/Socket.cpp
     src/various/Xtan2.cpp
     src/various/channels.cpp
