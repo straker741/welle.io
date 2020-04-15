@@ -6,7 +6,7 @@ MySQLhandler::MySQLhandler()
 {
     /* Create a connection */
     driver = get_driver_instance();
-    con = driver->connect("localhost", "root", "");
+    con = driver->connect("localhost", "stu", "korona2020");
 
     /* Connect to the MySQL test database */
     con->setSchema("bakalarka");
