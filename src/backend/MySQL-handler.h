@@ -31,6 +31,7 @@ class MySQLhandler
         MySQLhandler();
         ~MySQLhandler();
         int     executeInsert(double value, std::string table);
+        int     executeInsert(double SNR, uint32_t BW, std::string table);
     private:
         sql::Driver *driver = NULL;
         sql::Connection *con = NULL;
