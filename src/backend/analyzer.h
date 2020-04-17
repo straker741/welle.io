@@ -35,6 +35,8 @@ struct BitErrorRate
     uint32_t    faultyFIBs;
     float       faultyFIBs_rate;
     double      BER;
+    double      meanBER;
+    double      sumBER;
 };
 
 

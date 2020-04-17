@@ -83,6 +83,7 @@ class OfdmDecoder
 
         double SNR = 0;
         uint32_t bw = 0;
+        uint8_t snrCount = 0;
         DSPFLOAT noise = 0;
         DSPFLOAT signal = 0;
 

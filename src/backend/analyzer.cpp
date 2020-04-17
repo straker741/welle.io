@@ -6,6 +6,8 @@ Analyzer::Analyzer() : db() {
     ber.faultyFIBs = 0;
     ber.faultyFIBs_rate = 0;
     ber.BER = 0;
+    ber.meanBER = 0;
+    ber.sumBER = 0;
 }
 
 /**
@@ -103,14 +105,18 @@ void Analyzer::calculateBER()
     // (pseudo) channel BER
     ber.BER = (float)faultyBits/(float)(1536*2*3);
     //fprintf(stderr, "BER: %f\n", ber.BER);
-    db.executeInsert(ber.BER, "biterrorratio");
 
-    // Faulty FIBs Rate
-    ber.faultyFIBs_rate = ber.faultyFIBs/(float)ber.receivedFIBs;
-    //fprintf(stderr, "Faulty FIBs Rate: %f\n", ber.faultyFIBs_rate);
-    db.executeInsert(ber.faultyFIBs_rate, "fiberrorratio");
-    
-    ber.receivedFIBs = 0;
-    ber.faultyFIBs = 0;
+    ber.sumBER += ber.BER;
+    if (ber.receivedFIBs > 119) 
+        ber.meanBER = ber.sumBER / (float)(ber.receivedFIBs % 12);
 
+         // Faulty FIBs Rate
+        ber.faultyFIBs_rate = ber.faultyFIBs/(float)ber.receivedFIBs;
+        //fprintf(stderr, "Faulty FIBs Rate: %f\n", ber.faultyFIBs_rate);
+        db.executeInsert(ber.meanBER, ber.faultyFIBs_rate, "dabtable1");
+
+        ber.sumBER = 0;
+        ber.receivedFIBs = 0;
+        ber.faultyFIBs = 0;
+    }
 }

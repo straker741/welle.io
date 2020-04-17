@@ -12,12 +12,12 @@ MySQLhandler::MySQLhandler()
     con->setSchema("bakalarka");
 }
 
-int MySQLhandler::executeInsert(double value, string table)
+int MySQLhandler::executeInsert1(double BER, double FIBER, string table)
 {
     sql::Statement *stmt = NULL;
     try {
-        string v = to_string(value);
-        string q = "INSERT INTO " + table + " (value) VALUES (" + v + ")";
+        string v = to_string(BER) + ", " + to_string(FIBER);
+        string q = "INSERT INTO " + table + " (BER, FIBER) VALUES (" + v + ")";
         stmt = con->createStatement();
         stmt->execute(q);
         delete stmt;
@@ -33,7 +33,7 @@ int MySQLhandler::executeInsert(double value, string table)
     }
 }
 
-int MySQLhandler::executeInsert(double SNR, uint32_t BW, string table)
+int MySQLhandler::executeInsert2(double SNR, uint32_t BW, string table)
 {
     sql::Statement *stmt = NULL;
     try {

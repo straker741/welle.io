@@ -155,13 +155,17 @@ void OfdmDecoder::processPRS()
      * within the signal region and bits outside.
      * It is just an indication
      */
-    SNR = get_snr(fft_buffer);
-    //fprintf(stderr, "SNR: %f\n", SNR);
-    radioInterface.onSNR(SNR);
-    
-    bw = get_bw(fft_buffer);
-    //fprintf(stderr, "bandwidth: %d\n", bw);
-    db.executeInsert(SNR, bw, "dabtable");
+    if (++snrCount % 10) {
+        SNR = get_snr(fft_buffer);
+        //fprintf(stderr, "SNR: %f\n", SNR);
+        radioInterface.onSNR(SNR);
+
+        bw = get_bw(fft_buffer);
+        //fprintf(stderr, "bandwidth: %d\n", bw);
+        db.executeInsert(SNR, bw, "dabtable2");
+        snrCount = 0;
+    }
+   
     /**
      * we are now in the frequency domain, and we keep the carriers
      * as coming from the FFT as phase reference.
