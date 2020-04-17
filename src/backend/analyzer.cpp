@@ -112,4 +112,5 @@ void Analyzer::calculateBER()
     
     ber.receivedFIBs = 0;
     ber.faultyFIBs = 0;
+
 }

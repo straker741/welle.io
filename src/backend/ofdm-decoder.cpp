@@ -160,6 +160,8 @@ void OfdmDecoder::processPRS()
     db.executeInsert(SNR, "signaltonoiseratio");
     radioInterface.onSNR(SNR);
     
+    get_bw();
+
     /**
      * we are now in the frequency domain, and we keep the carriers
      * as coming from the FFT as phase reference.
@@ -239,23 +241,55 @@ void OfdmDecoder::decodeDataSymbol(int32_t sym_ix)
  */
 double OfdmDecoder::get_snr(DSPCOMPLEX *v)
 {
-    int16_t i;
-    DSPFLOAT    noise   = 0;
-    DSPFLOAT    signal  = 0;
-    const auto T_u = params.T_u;
-    int16_t low = T_u / 2 -  params.K / 2;
-    int16_t high    = low + params.K;
-
-    for (i = 10; i < low - 20; i ++)
-        noise += abs (v[(T_u / 2 + i) % T_u]);
-
-    for (i = high + 20; i < T_u - 10; i ++)
-        noise += abs (v[(T_u / 2 + i) % T_u]);
-
-    noise   /= (low - 30 + T_u - high - 30);
-    for (i = T_u / 2 - params.K / 4;  i < T_u / 2 + params.K / 4; i ++)
-        signal += abs (v[(T_u / 2 + i) % T_u]);
-
-    return get_db_over_256(signal / (params.K / 2)) - get_db_over_256(noise);
+    noise  = get_noise(v);
+    signal = get_signal(v);
+    return get_db_over_256(signal) - get_db_over_256(noise);
 }
 
+float OfdmDecoder::get_noise(DSPCOMPLEX *a)
+{
+    int16_t i;
+    float noise = 0;
+    const auto T_u = params.T_u;
+    int16_t low = T_u / 2 -  params.K / 2;
+    int16_t high = low + params.K;
+
+    for (i = 10; i < low - 20; i ++) {
+        noise += abs (a[(T_u / 2 + i) % T_u]);
+    }
+    for (i = high + 20; i < T_u - 10; i ++) {
+        noise += abs (a[(T_u / 2 + i) % T_u]);
+    }
+    return noise / (low - 30 + T_u - high - 30);
+}
+
+float OfdmDecoder::get_signal(DSPCOMPLEX *a)
+{
+    float signal = 0;
+    const auto T_u = params.T_u;
+    for (int16_t i = T_u / 2 - params.K / 4;  i < T_u / 2 + params.K / 4; i ++)
+        signal += abs (a[(T_u / 2 + i) % T_u]);
+    return signal / (params.K / 2);
+}
+
+uint32_t get_bw(DSPCOMPLEX *a)
+{
+    uint16_t i;
+    uint16_t f1 = 0, f2 = 0;
+    const auto T_u = params.T_u;
+    float middle = signal / noise;
+
+    for (i = 128; 1==1; i++) {
+        if (midValue <= abs(a[i])) {           
+            f1 = i;
+            break;
+        }
+    }
+    for (i = T_u - 128; 1==1; i--) {
+        if (midValue <= abs(a[i])) {
+            f2 = i;
+            break;
+        }
+    }
+    fprintf(stderr, "bandwidth: %f\n", f2 - f1);
+    return 0;

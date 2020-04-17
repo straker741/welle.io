@@ -52,7 +52,9 @@ class OfdmDecoder
         void    reset();
     private:
         MySQLhandler db;
-        double get_snr(DSPCOMPLEX *);
+        float get_signal(DSPCOMPLEX *a);
+        float get_noise(DSPCOMPLEX *a);
+        double get_snr(DSPCOMPLEX *v);
 
         const DABParams& params;
         RadioControllerInterface& radioInterface;
@@ -79,6 +81,8 @@ class OfdmDecoder
         std::vector<softbit_t> ibits;
 
         double SNR = 0;
+        float noise = 0;
+        float signal = 0;
 
         const double mer_alpha = 1e-7;
         std::atomic<double> mer = ATOMIC_VAR_INIT(0.0);

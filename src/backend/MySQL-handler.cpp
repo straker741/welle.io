@@ -14,11 +14,13 @@ MySQLhandler::MySQLhandler()
 
 int MySQLhandler::executeInsert(double value, string table)
 {
+    sql::Statement *stmt = NULL;
     try {
         string v = to_string(value);
         string q = "INSERT INTO " + table + " (value) VALUES (" + v + ")";
         stmt = con->createStatement();
         stmt->execute(q);
+        delete stmt;
         return 0;
     }
     catch (sql::SQLException &e) {
@@ -33,6 +35,5 @@ int MySQLhandler::executeInsert(double value, string table)
 
 MySQLhandler::~MySQLhandler()
 {
-    delete stmt;
     delete con;
 }
