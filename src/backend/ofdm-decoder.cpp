@@ -155,7 +155,7 @@ void OfdmDecoder::processPRS()
      * within the signal region and bits outside.
      * It is just an indication
      */
-    if (++snrCount % 10) {
+    if (++snrCount >= 10) {
         SNR = get_snr(fft_buffer);
         //fprintf(stderr, "SNR: %f\n", SNR);
         radioInterface.onSNR(SNR);

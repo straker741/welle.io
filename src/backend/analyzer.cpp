@@ -107,10 +107,10 @@ void Analyzer::calculateBER()
     //fprintf(stderr, "BER: %f\n", ber.BER);
 
     ber.sumBER += ber.BER;
-    if (ber.receivedFIBs > 119) 
-        ber.meanBER = ber.sumBER / (float)(ber.receivedFIBs % 12);
+    if (ber.receivedFIBs > 119) {
+        ber.meanBER = ber.sumBER / 10.0;
 
-         // Faulty FIBs Rate
+        // Faulty FIBs Rate
         ber.faultyFIBs_rate = ber.faultyFIBs/(float)ber.receivedFIBs;
         //fprintf(stderr, "Faulty FIBs Rate: %f\n", ber.faultyFIBs_rate);
         db.executeInsert1(ber.meanBER, ber.faultyFIBs_rate, "dabtable1");
