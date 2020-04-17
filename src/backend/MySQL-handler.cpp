@@ -33,7 +33,6 @@ int MySQLhandler::executeInsert(double value, string table)
 
 MySQLhandler::~MySQLhandler()
 {
-    delete res;
     delete stmt;
     delete con;
 }

@@ -549,6 +549,9 @@ int main(int argc, char **argv)
         else {
 #if defined(HAVE_ALSA)
             AlsaProgrammeHandler ph;
+#else
+            cerr << "NO ALSA support. Unable to listen to programme." << endl;
+#endif
             while (not service_to_tune.empty()) {
                 cerr << "Service list" << endl;
                 for (const auto& s : rx.getServiceList()) {
@@ -565,7 +568,7 @@ int main(int argc, char **argv)
                     }
                     cerr << endl;
                 }
-
+#if defined(HAVE_ALSA)
                 bool service_selected = false;
                 for (const auto s : rx.getServiceList()) {
                     if (s.serviceLabel.utf8_label().find(service_to_tune) != string::npos) {
@@ -585,8 +588,9 @@ int main(int argc, char **argv)
                 if (not service_selected) {
                     cerr << "Could not tune to " << service_to_tune << endl;
                 }
-
-                cerr << "**** Please enter programme name. Enter '.' to quit." << endl;
+                cerr << "**** Please enter programme name. "
+#else
+                cerr << "Enter '.' to quit." << endl;
 
                 cin >> service_to_tune;
                 if (service_to_tune == ".") {
@@ -594,8 +598,6 @@ int main(int argc, char **argv)
                 }
                 cerr << "**** Trying to tune to " << service_to_tune << endl;
             }
-#else
-            cerr << "Nothing to do, not ALSA support." << endl;
 #endif // defined(HAVE_ALSA)
         }
     }
