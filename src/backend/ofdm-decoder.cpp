@@ -280,16 +280,17 @@ uint32_t get_bw(DSPCOMPLEX *a)
     float middle = signal / noise;
 
     for (i = 128; 1==1; i++) {
-        if (midValue <= abs(a[i])) {           
+        if (middle <= abs(a[i])) {           
             f1 = i;
             break;
         }
     }
     for (i = T_u - 128; 1==1; i--) {
-        if (midValue <= abs(a[i])) {
+        if (middle <= abs(a[i])) {
             f2 = i;
             break;
         }
     }
     fprintf(stderr, "bandwidth: %f\n", f2 - f1);
     return 0;
+}
