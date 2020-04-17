@@ -113,7 +113,7 @@ void Analyzer::calculateBER()
          // Faulty FIBs Rate
         ber.faultyFIBs_rate = ber.faultyFIBs/(float)ber.receivedFIBs;
         //fprintf(stderr, "Faulty FIBs Rate: %f\n", ber.faultyFIBs_rate);
-        db.executeInsert(ber.meanBER, ber.faultyFIBs_rate, "dabtable1");
+        db.executeInsert1(ber.meanBER, ber.faultyFIBs_rate, "dabtable1");
 
         ber.sumBER = 0;
         ber.receivedFIBs = 0;

@@ -162,7 +162,7 @@ void OfdmDecoder::processPRS()
 
         bw = get_bw(fft_buffer);
         //fprintf(stderr, "bandwidth: %d\n", bw);
-        db.executeInsert(SNR, bw, "dabtable2");
+        db.executeInsert2(SNR, bw, "dabtable2");
         snrCount = 0;
     }
    
